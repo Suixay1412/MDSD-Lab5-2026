@@ -504,12 +504,6 @@ class HomePage extends StatelessWidget {
 
 > ✅ **Checkpoint 2.2** ทดสอบว่าเมื่อบันทึกสินค้าจากหน้า Home แล้วกดไปหน้า Favorites ตัวเลขและรายการสินค้าตรงกันทันที ลองกดปุ่มถังขยะลบสินค้าออกจากหน้า Favorites แล้วย้อนกลับไปหน้า Home ดูว่าปุ่มของสินค้านั้นกลับมากดซ้ำได้อีกครั้ง ถ่ายภาพหน้าจอทั้งสองหน้าเทียบกันแนบส่ง
 
-```text
-Checkpoint 2.1: หลังใช้ Provider สามารถนำ savedItems และ onSave ออกจาก constructor ของ ItemCard และ ItemListSection ได้เพราะ Widget สามารถเข้าถึง State ผ่าน FavoritesModel โดยตรง ทำให้ไม่ต้องส่งข้อมูลผ่าน Widget Tree หลายชั้นเหมือนเดิม
-
-Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage สินค้าจะปรากฏใน FavoritesPage ทันที และเมื่อกดลบจาก FavoritesPage ข้อมูลใน HomePage ก็ถูกอัปเดตตาม แสดงให้เห็นว่าทั้งสองหน้าใช้ State ชุดเดียวกันผ่าน FavoritesModel และไม่จำเป็นต้องส่ง savedItems ข้าม Route ด้วย Prop Drilling
-```
-
 ![Checkpoint 2.1](images/checkpoint-2.1.png)
 
 ![Checkpoint 2.2](images/checkpoint-2.2.png)
@@ -538,7 +532,7 @@ Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage 
 
 บันทึกคำตอบที่ได้จาก Gemini 
 
-```text
+	
 สำหรับการเลือกเครื่องมือจัดการ State ในแอป Campus Marketplace ของคุณ ผมขอสรุปคำแนะนำที่เหมาะสมที่สุดตามหลักการ "เลือกเครื่องมือให้เหมาะกับขอบเขตของข้อมูล (Scope)" ดังนี้ครับ:
 
 ---
@@ -569,7 +563,6 @@ Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage 
 | **Heart Animation** | เฉพาะปุ่ม (Local) | **setState** | ทำงานเร็ว โค้ดไม่ซับซ้อน ไม่แชร์ข้อมูล |
 
 **คำแนะนำเพิ่มเติม:** หากคุณตัดสินใจใช้ **Riverpod** เป็นหลักในโปรเจกต์นี้แล้ว แนะนำให้ใช้คู่กับ `StatefulWidget` เฉพาะตอนทำ Animation หรือรับค่าจาก Form เท่านั้น ส่วนเรื่อง Data และ Logic ทั้งหมดให้ยกไปไว้ใน Riverpod จะทำให้แอปคุณ Test ง่ายและจัดการ Bug ได้ดีขึ้นครับ
-```
 
 
 ### ขั้นตอนที่ 3.2: ประเมินคำตอบของ AI
@@ -739,8 +732,6 @@ class HomePage extends ConsumerWidget {
 > ✅ **Checkpoint 4.2** เขียนตารางเปรียบเทียบสั้น ๆ ว่าตอนแปลงจาก Provider เป็น Riverpod ต้องเปลี่ยนอะไรบ้าง (เช่น `ChangeNotifier` → `StateNotifier`, `StatelessWidget` → `ConsumerWidget`, `context.watch` → `ref.watch`) อย่างน้อย 4 คู่เทียบ
 
 ![Checkpoint 4.1](images/checkpoint-4.1.png)
-
-```text
 # สรุปตารางเปรียบเทียบ Provider vs Riverpod (Checkpoint 4.2)
 
 ใบงานปฏิบัติสัปดาห์ที่ 5: State Management ด้วย Provider และ Riverpod
@@ -749,35 +740,14 @@ class HomePage extends ConsumerWidget {
 
 ## 📊 ตารางเปรียบเทียบ Provider vs Riverpod
 
-| มิติ / รายการเปรียบเทียบ | Provider (ส่วนที่ 2) | Riverpod (ส่วนที่ 4) | เหตุผล / คำอธิบาย |
-| :--- | :--- | :--- | :--- |
-| **1. คลาสที่ใช้จัดการ State** | `ChangeNotifier` | `StateNotifier<T>` | Riverpod ใช้แนวคิด Immutable State (สร้าง State ก้อนใหม่แทนการแก้ไขค่าเดิม) |
-| **2. การอัปเดตข้อมูล / แจ้งเตือน UI** | เรียก `notifyListeners()` | กำหนดค่าใหม่ให้ `state = ...` | การกำหนดค่าให้ `state` ก้อนใหม่ใน Riverpod จะแจ้ง UI ให้อัปเดตอัตโนมัติ |
-| **3. ชนิดของ Widget ที่ใช้งาน** | `StatelessWidget` / `StatefulWidget` | `ConsumerWidget` / `ConsumerStatefulWidget` | เพื่อรับพารามิเตอร์ `WidgetRef ref` เข้ามาใช้งานในเมธอด `build()` |
-| **4. การครอบ Root ที่จุดเริ่มต้นแอป** | `ChangeNotifierProvider(...)` | `ProviderScope(...)` | Riverpod ไม่พึ่งพา `BuildContext` จึงใช้ `ProviderScope` ครอบแอปเพียงครั้งเดียว |
-| **5. การติดตามและดึงค่าแสดงผล** | `context.watch<T>()` | `ref.watch(provider)` | เปลี่ยนจากการค้นหาผ่าน `context` มาใช้ `ref` เพื่อติดตามข้อมูล |
-| **6. การอ่านค่าครั้งเดียว / เรียกเมธอด** | `context.read<T>()` | `ref.read(provider.notifier)` | ใช้เข้าถึงตัว Notifier เพื่อเรียกเมธอดสั่งการ เช่น `add()` โดยไม่ rebuild widget |
-
----
-
-## 📝 สรุปความแตกต่างสำคัญ 4 ประการ
-
-1. **การเข้าถึงข้อมูล (No BuildContext Requirement):**
-   - **Provider:** ต้องอาศัย `BuildContext` ในการค้นหา Provider ขึ้นไปบน Widget Tree (`context.watch`, `context.read`)
-   - **Riverpod:** ใช้ `WidgetRef` หรือ `ref` ในการเข้าถึงข้อมูล ทำให้เรียกใช้นอก Widget Tree ได้ง่ายขึ้นและมีความปลอดภัยทาง Type (Compile-time safety)
-
-2. **รูปแบบของ State (Mutable vs Immutable):**
-   - **Provider:** ใช้ `ChangeNotifier` แก้ไขข้อมูลในตัวแปรเดิม (Mutate) แล้วส่งสัญญาณแจ้งด้วย `notifyListeners()`
-   - **Riverpod:** นิยมใช้ `StateNotifier` ที่มอง State เป็นก้อนข้อมูลที่ไม่ควรถูกแก้ไขโดยตรง (Immutable) เมื่อต้องการเปลี่ยนข้อมูลจะสร้าง State ก้อนใหม่มาแทนที่ `state = [...]`
-
-3. **โครงสร้างของ Widget (ConsumerWidget):**
-   - **Provider:** ใช้ `StatelessWidget` หรือ `StatefulWidget` ปกติ
-   - **Riverpod:** เปลี่ยนมาใช้ `ConsumerWidget` เพื่อรับตัวแปร `ref` มาใช้งานในเมธอด `build(BuildContext context, WidgetRef ref)`
-
-4. **การประกาศใช้งาน (Global Provider Declaration):**
-   - **Provider:** ต้องนำไปผูกไว้ใน Widget Tree ผ่าน `ChangeNotifierProvider` ที่ `main.dart` หรือตำแหน่งเหนือ Widget ที่ต้องการใช้
-   - **Riverpod:** ประกาศ Provider เป็นตัวแปร Global ไว้ลายนอก แล้วครอบ `MyApp` ด้วย `ProviderScope` เพียงจุดเดียว
-```
+| มิติ / รายการเปรียบเทียบ                 | Provider (ส่วนที่ 2)                 | Riverpod (ส่วนที่ 4)                        | เหตุผล / คำอธิบาย                                                                |
+| :--------------------------------------- | :----------------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------- |
+| **1. คลาสที่ใช้จัดการ State**            | `ChangeNotifier`                     | `StateNotifier<T>`                          | Riverpod ใช้แนวคิด Immutable State (สร้าง State ก้อนใหม่แทนการแก้ไขค่าเดิม)      |
+| **2. การอัปเดตข้อมูล / แจ้งเตือน UI**    | เรียก `notifyListeners()`            | กำหนดค่าใหม่ให้ `state = ...`               | การกำหนดค่าให้ `state` ก้อนใหม่ใน Riverpod จะแจ้ง UI ให้อัปเดตอัตโนมัติ          |
+| **3. ชนิดของ Widget ที่ใช้งาน**          | `StatelessWidget` / `StatefulWidget` | `ConsumerWidget` / `ConsumerStatefulWidget` | เพื่อรับพารามิเตอร์ `WidgetRef ref` เข้ามาใช้งานในเมธอด `build()`                |
+| **4. การครอบ Root ที่จุดเริ่มต้นแอป**    | `ChangeNotifierProvider(...)`        | `ProviderScope(...)`                        | Riverpod ไม่พึ่งพา `BuildContext` จึงใช้ `ProviderScope` ครอบแอปเพียงครั้งเดียว  |
+| **5. การติดตามและดึงค่าแสดงผล**          | `context.watch<T>()`                 | `ref.watch(provider)`                       | เปลี่ยนจากการค้นหาผ่าน `context` มาใช้ `ref` เพื่อติดตามข้อมูล                   |
+| **6. การอ่านค่าครั้งเดียว / เรียกเมธอด** | `context.read<T>()`                  | `ref.read(provider.notifier)`               | ใช้เข้าถึงตัว Notifier เพื่อเรียกเมธอดสั่งการ เช่น `add()` โดยไม่ rebuild widget |
 
 
 ---
@@ -794,7 +764,7 @@ class HomePage extends ConsumerWidget {
 
 - ต้องตัดสินใจเองว่าค่าคำค้นหาควรเป็น Ephemeral State หรือ App State พร้อมให้เหตุผลสั้น ๆ ไว้ในช่องด้านล่าง
   ```text
-
+ใช้ Ephemeral State เพราะ ข้อความค้นหาเป็นข้อมูลชั่วคราวที่ถูกใช้งานเฉพาะภายในHomePage เพื่อกรองรายการสินค้าที่แสดงเท่านั้น ไม่มีหน้าจออื่นหรือ Widget นอกเหนือจากนี้จำเป็นต้องใช้คำค้นหานี้ร่วมด้วย ดังนั้น การเลือกใช้ setState ธรรมดาจึงเป็นวิธีที่เบาที่สุดและเพียงพอต่อการใช้งาน
   ```
 - ถ้าตัดสินใจว่าเป็น Ephemeral State ห้ามใช้ Provider สำหรับฟีเจอร์นี้ ให้ฝึกเลือกใช้เครื่องมือที่เบาที่สุดที่เพียงพอ (`setState` ธรรมดา)
 
@@ -806,8 +776,7 @@ class HomePage extends ConsumerWidget {
 
 - ต้องใช้ `context.read` หรือ `context.watch` ให้ถูกต้องตามหลักการ และอธิบายเหตุผลการเลือก ในช่องด้านล่าง
   ```text
-
-
+ใช้ context.read และ context.watch เพราะ context.read ใช้เรียกเมธอด clear() ตอนกดปุ่มยืนยันใน เพื่อป็นการสั่งงานหรือแก้ไขข้อมูลเพียงครั้งเดียวตอนกดปุ่ม ส่วน context.watch ใช้ตรวจสอบจำนวนรายการโปรดเพื่อควบคุมเงื่อนไขการแสดงผลหรือซ่อนปุ่มล้างรายการใน AppBar ซึ่งต้องคอย rebuild UI เมื่อจำนวนรายการเปลี่ยน
   ```
 - ปุ่มต้องแสดงเฉพาะเมื่อมีรายการโปรดอย่างน้อย 1 รายการเท่านั้น (ถ้ารายการว่างอยู่แล้วไม่ต้องแสดงปุ่มนี้)
 
