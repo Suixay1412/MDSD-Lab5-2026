@@ -246,9 +246,9 @@ class MyApp extends StatelessWidget {
 เมื่อ FavoritesPage เป็นอีก Route หนึ่ง จะไม่สามารถส่ง savedItems จาก HomePage ผ่าน Prop Drilling ได้โดยตรง เพราะไม่ได้อยู่ใน Widget Tree เดียวกัน จึงต้องหาวิธีจัดการ State ที่สามารถแชร์ข้อมูลระหว่างหลายหน้าจอได้
 ```
 
-![Checkpoint 1](images/screenshot-1.png)
+![Checkpoint 1](images/checkpoint-1.png)
 
-![Checkpoint 2](images/screenshot-2.png)
+![Checkpoint 2](images/checkpoint-2.png)
 
 ---
 
