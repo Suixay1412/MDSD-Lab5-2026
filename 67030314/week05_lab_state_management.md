@@ -505,7 +505,7 @@ class HomePage extends StatelessWidget {
 > ✅ **Checkpoint 2.2** ทดสอบว่าเมื่อบันทึกสินค้าจากหน้า Home แล้วกดไปหน้า Favorites ตัวเลขและรายการสินค้าตรงกันทันที ลองกดปุ่มถังขยะลบสินค้าออกจากหน้า Favorites แล้วย้อนกลับไปหน้า Home ดูว่าปุ่มของสินค้านั้นกลับมากดซ้ำได้อีกครั้ง ถ่ายภาพหน้าจอทั้งสองหน้าเทียบกันแนบส่ง
 
 ```text
-Checkpoint 2.1: หลังใช้ Provider สามารถนำ savedItems และ onSave ออกจาก constructor ของ ItemCard และ ItemListSection ได้ เพราะ Widget สามารถเข้าถึง State ผ่าน FavoritesModel โดยตรง ทำให้ไม่ต้องส่งข้อมูลผ่าน Widget Tree หลายชั้นเหมือนเดิม
+Checkpoint 2.1: หลังใช้ Provider สามารถนำ savedItems และ onSave ออกจาก constructor ของ ItemCard และ ItemListSection ได้เพราะ Widget สามารถเข้าถึง State ผ่าน FavoritesModel โดยตรง ทำให้ไม่ต้องส่งข้อมูลผ่าน Widget Tree หลายชั้นเหมือนเดิม
 
 Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage สินค้าจะปรากฏใน FavoritesPage ทันที และเมื่อกดลบจาก FavoritesPage ข้อมูลใน HomePage ก็ถูกอัปเดตตาม แสดงให้เห็นว่าทั้งสองหน้าใช้ State ชุดเดียวกันผ่าน FavoritesModel และไม่จำเป็นต้องส่ง savedItems ข้าม Route ด้วย Prop Drilling
 ```
@@ -539,7 +539,36 @@ Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage 
 บันทึกคำตอบที่ได้จาก Gemini 
 
 ```text
+สำหรับการเลือกเครื่องมือจัดการ State ในแอป Campus Marketplace ของคุณ ผมขอสรุปคำแนะนำที่เหมาะสมที่สุดตามหลักการ "เลือกเครื่องมือให้เหมาะกับขอบเขตของข้อมูล (Scope)" ดังนี้ครับ:
 
+---
+
+### 1. Dark Mode / Light Mode
+**เครื่องมือที่แนะนำ:** **Riverpod** (หรือ Provider)
+*   **เหตุผล:** ข้อมูลโหมดของแอปเป็น **Global State** ที่ส่งผลกระทบต่อทุก Widget ในทุกหน้าจอ การใช้ Riverpod จะช่วยให้คุณเข้าถึงสถานะ Theme ได้จากทุกที่โดยไม่ต้องส่งผ่าน Constructor (Prop Drilling) และ Riverpod จัดการเรื่องการ Rebuild เฉพาะส่วนที่จำเป็นได้มีประสิทธิภาพมาก รวมถึงเขียน Code ได้สะอาดกว่า Provider ในระยะยาว
+
+### 2. ตัวนับ "มีคนถูกใจแล้วกี่คน" (ซิงค์ข้ามหน้า)
+**เครื่องมือที่แนะนำ:** **Riverpod**
+*   **เหตุผล:** นี่คือ **Shared State** ข้อมูลชุดเดียวกัน (จำนวน Like ของสินค้า ID หนึ่งๆ) ถูกแสดงผลในหลายที่ (หน้ารายการ และ หน้ารายละเอียด) หากกดถูกใจในหน้าหนึ่ง อีกหน้าต้องเปลี่ยนตามทันที
+*   **ทำไมไม่ใช้ setState:** เพราะ `setState` ทำงานเฉพาะภายใน Widget นั้นๆ ไม่สามารถส่งสัญญาณข้ามหน้าจอได้อย่างสะดวก
+*   **ทำไมถึงแนะนำ Riverpod:** เพราะคุณสามารถสร้าง `StateNotifier` หรือ `AsyncNotifier` เพื่อจัดการ Logic การกดถูกใจ (เช่น อัปเดต Database + อัปเดต UI) ได้ในที่เดียว และ Widget ทุกตัวที่ Listen ข้อมูล ID นั้นอยู่จะอัปเดตพร้อมกันโดยอัตโนมัติ
+
+### 3. Animation กระพริบของไอคอนหัวใจ (เฉพาะจุด)
+**เครื่องมือที่แนะนำ:** **setState** (ภายใน StatefulWidget)
+*   **เหตุผล:** นี่คือ **Local State** หรือ **UI State** แท้ๆ เป็น Logic ที่เกี่ยวข้องกับการแสดงผลของตัว Widget นั้นตัวเดียว ไม่มีความจำเป็นต้องให้ Widget อื่นข้างนอกรับรู้ว่าตอนนี้หัวใจกำลังกระพริบอยู่หรือไม่
+*   **ข้อดี:** การใช้ `AnimationController` ร่วมกับ `setState` (หรือ `AnimatedBuilder`) ภายใน `StatefulWidget` มีประสิทธิภาพสูงที่สุดสำหรับงานประเภทนี้ และไม่ทำให้โครงสร้างโปรแกรมซับซ้อนโดยไม่จำเป็น ("อย่าใช้ดาบฆ่ามังกร มาใช้ปลอกผลไม้")
+
+---
+
+### ตารางสรุปการตัดสินใจ
+
+| ฟีเจอร์ | ขอบเขต (Scope) | เครื่องมือที่เหมาะสม | เหตุผลหลัก |
+| :--- | :--- | :--- | :--- |
+| **Theme (Dark/Light)** | ทั้งแอป (Global) | **Riverpod** | เข้าถึงได้จากทุกหน้า จัดการง่าย |
+| **Like Counter** | หลายหน้า (Shared) | **Riverpod** | ข้อมูลซิงค์กัน (Data Consistency) |
+| **Heart Animation** | เฉพาะปุ่ม (Local) | **setState** | ทำงานเร็ว โค้ดไม่ซับซ้อน ไม่แชร์ข้อมูล |
+
+**คำแนะนำเพิ่มเติม:** หากคุณตัดสินใจใช้ **Riverpod** เป็นหลักในโปรเจกต์นี้แล้ว แนะนำให้ใช้คู่กับ `StatefulWidget` เฉพาะตอนทำ Animation หรือรับค่าจาก Form เท่านั้น ส่วนเรื่อง Data และ Logic ทั้งหมดให้ยกไปไว้ใน Riverpod จะทำให้แอปคุณ Test ง่ายและจัดการ Bug ได้ดีขึ้นครับ
 ```
 
 
@@ -550,7 +579,7 @@ Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage 
 - Gemini แนะนำตรงกับกรอบการตัดสินใจในบทเรียนหรือไม่ มีจุดใดที่ต่างกัน
   
 ```text
-
+Gemini แนะนำสอดคล้องกับกรอบการตัดสินใจในบทเรียนในเรื่องการพิจารณาขอบเขตของ State โดยแนะนำให้ใช้ setState กับ Animation ที่อยู่เฉพาะ Widget เดียว และใช้ State Management สำหรับข้อมูลที่ต้องแชร์หลายหน้าจอ แต่มีจุดที่ต่างกันคือกรอบในบทเรียนแนะนำให้ใช้ Provider ก่อนเมื่อ State ต้องใช้ข้ามหลายหน้าจอ และค่อยพิจารณา Riverpod เมื่อโครงการต้องการ Unit Test ที่เข้มงวดหรือ Type Safety สูงขึ้น ขณะที่ Gemini แนะนำ Riverpod สำหรับ Dark/Light Mode และ Like Counter ตั้งแต่แรก โดยไม่ได้เน้นเงื่อนไขการเลือก Provider ก่อนตามกรอบของบทเรียน
 ```
 - หากคำตอบของ Gemini ดูสมเหตุสมผลแต่ยังไม่ครบถ้วน (เช่น ไม่ได้พูดถึงขอบเขตของ Widget) ให้ลองถามคำถามต่อเพื่อขอเหตุผลเพิ่มเติม แล้วบันทึกบทสนทนาไว้ด้วย
 ```text
@@ -708,6 +737,48 @@ class HomePage extends ConsumerWidget {
 > ✅ **Checkpoint 4.1** รันแอปด้วย `flutter run` (หรือกด F5 ใน VS Code) แล้วทดสอบกดปุ่ม "บันทึก" ที่สินค้าชิ้นใดก็ได้ ตรวจว่าตัวเลข ❤️ ที่ AppBar เพิ่มขึ้นถูกต้อง ถ่ายภาพหน้าจอแนบส่ง
 
 > ✅ **Checkpoint 4.2** เขียนตารางเปรียบเทียบสั้น ๆ ว่าตอนแปลงจาก Provider เป็น Riverpod ต้องเปลี่ยนอะไรบ้าง (เช่น `ChangeNotifier` → `StateNotifier`, `StatelessWidget` → `ConsumerWidget`, `context.watch` → `ref.watch`) อย่างน้อย 4 คู่เทียบ
+
+![Checkpoint 4.1](images/checkpoint-4.1.png)
+
+```text
+# สรุปตารางเปรียบเทียบ Provider vs Riverpod (Checkpoint 4.2)
+
+ใบงานปฏิบัติสัปดาห์ที่ 5: State Management ด้วย Provider และ Riverpod
+
+---
+
+## 📊 ตารางเปรียบเทียบ Provider vs Riverpod
+
+| มิติ / รายการเปรียบเทียบ | Provider (ส่วนที่ 2) | Riverpod (ส่วนที่ 4) | เหตุผล / คำอธิบาย |
+| :--- | :--- | :--- | :--- |
+| **1. คลาสที่ใช้จัดการ State** | `ChangeNotifier` | `StateNotifier<T>` | Riverpod ใช้แนวคิด Immutable State (สร้าง State ก้อนใหม่แทนการแก้ไขค่าเดิม) |
+| **2. การอัปเดตข้อมูล / แจ้งเตือน UI** | เรียก `notifyListeners()` | กำหนดค่าใหม่ให้ `state = ...` | การกำหนดค่าให้ `state` ก้อนใหม่ใน Riverpod จะแจ้ง UI ให้อัปเดตอัตโนมัติ |
+| **3. ชนิดของ Widget ที่ใช้งาน** | `StatelessWidget` / `StatefulWidget` | `ConsumerWidget` / `ConsumerStatefulWidget` | เพื่อรับพารามิเตอร์ `WidgetRef ref` เข้ามาใช้งานในเมธอด `build()` |
+| **4. การครอบ Root ที่จุดเริ่มต้นแอป** | `ChangeNotifierProvider(...)` | `ProviderScope(...)` | Riverpod ไม่พึ่งพา `BuildContext` จึงใช้ `ProviderScope` ครอบแอปเพียงครั้งเดียว |
+| **5. การติดตามและดึงค่าแสดงผล** | `context.watch<T>()` | `ref.watch(provider)` | เปลี่ยนจากการค้นหาผ่าน `context` มาใช้ `ref` เพื่อติดตามข้อมูล |
+| **6. การอ่านค่าครั้งเดียว / เรียกเมธอด** | `context.read<T>()` | `ref.read(provider.notifier)` | ใช้เข้าถึงตัว Notifier เพื่อเรียกเมธอดสั่งการ เช่น `add()` โดยไม่ rebuild widget |
+
+---
+
+## 📝 สรุปความแตกต่างสำคัญ 4 ประการ
+
+1. **การเข้าถึงข้อมูล (No BuildContext Requirement):**
+   - **Provider:** ต้องอาศัย `BuildContext` ในการค้นหา Provider ขึ้นไปบน Widget Tree (`context.watch`, `context.read`)
+   - **Riverpod:** ใช้ `WidgetRef` หรือ `ref` ในการเข้าถึงข้อมูล ทำให้เรียกใช้นอก Widget Tree ได้ง่ายขึ้นและมีความปลอดภัยทาง Type (Compile-time safety)
+
+2. **รูปแบบของ State (Mutable vs Immutable):**
+   - **Provider:** ใช้ `ChangeNotifier` แก้ไขข้อมูลในตัวแปรเดิม (Mutate) แล้วส่งสัญญาณแจ้งด้วย `notifyListeners()`
+   - **Riverpod:** นิยมใช้ `StateNotifier` ที่มอง State เป็นก้อนข้อมูลที่ไม่ควรถูกแก้ไขโดยตรง (Immutable) เมื่อต้องการเปลี่ยนข้อมูลจะสร้าง State ก้อนใหม่มาแทนที่ `state = [...]`
+
+3. **โครงสร้างของ Widget (ConsumerWidget):**
+   - **Provider:** ใช้ `StatelessWidget` หรือ `StatefulWidget` ปกติ
+   - **Riverpod:** เปลี่ยนมาใช้ `ConsumerWidget` เพื่อรับตัวแปร `ref` มาใช้งานในเมธอด `build(BuildContext context, WidgetRef ref)`
+
+4. **การประกาศใช้งาน (Global Provider Declaration):**
+   - **Provider:** ต้องนำไปผูกไว้ใน Widget Tree ผ่าน `ChangeNotifierProvider` ที่ `main.dart` หรือตำแหน่งเหนือ Widget ที่ต้องการใช้
+   - **Riverpod:** ประกาศ Provider เป็นตัวแปร Global ไว้ลายนอก แล้วครอบ `MyApp` ด้วย `ProviderScope` เพียงจุดเดียว
+```
+
 
 ---
 
