@@ -504,9 +504,19 @@ class HomePage extends StatelessWidget {
 
 > ✅ **Checkpoint 2.2** ทดสอบว่าเมื่อบันทึกสินค้าจากหน้า Home แล้วกดไปหน้า Favorites ตัวเลขและรายการสินค้าตรงกันทันที ลองกดปุ่มถังขยะลบสินค้าออกจากหน้า Favorites แล้วย้อนกลับไปหน้า Home ดูว่าปุ่มของสินค้านั้นกลับมากดซ้ำได้อีกครั้ง ถ่ายภาพหน้าจอทั้งสองหน้าเทียบกันแนบส่ง
 
-```image
+```text
+Checkpoint 2.1: หลังใช้ Provider สามารถนำ savedItems และ onSave ออกจาก constructor ของ ItemCard และ ItemListSection ได้ เพราะ Widget สามารถเข้าถึง State ผ่าน FavoritesModel โดยตรง ทำให้ไม่ต้องส่งข้อมูลผ่าน Widget Tree หลายชั้นเหมือนเดิม
 
+Checkpoint 2.2: เมื่อเพิ่มสินค้าใน HomePage สินค้าจะปรากฏใน FavoritesPage ทันที และเมื่อกดลบจาก FavoritesPage ข้อมูลใน HomePage ก็ถูกอัปเดตตาม แสดงให้เห็นว่าทั้งสองหน้าใช้ State ชุดเดียวกันผ่าน FavoritesModel และไม่จำเป็นต้องส่ง savedItems ข้าม Route ด้วย Prop Drilling
 ```
+
+![Checkpoint 2.1](images/checkpoint-2.1.png)
+
+![Checkpoint 2.2](images/checkpoint-2.2.png)
+
+![Checkpoint 2.1.1](images/checkpoint-2.1.1.png)
+
+![Checkpoint 2.2](images/checkpoint-2.2.2.png)
 
 ---
 
